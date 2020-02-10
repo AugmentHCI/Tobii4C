@@ -75,3 +75,9 @@ data/
 rawdata/
 
 objects/
+
+Parsers/__pycache__/
+
+Segments/
+
+Experiment/__pycache__/
