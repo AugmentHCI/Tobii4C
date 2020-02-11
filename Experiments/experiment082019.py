@@ -1,10 +1,3 @@
-from Parsers.ParserAOI import ParserAOI
-from Parsers.ParserSegment import ParserSegment
-from Parsers.ParserRawET import ParserRawET
-from AnalyserFixations import AnalyserFixations
-from AnalyserSaccades import AnalyserSaccades
-from Experiment.Participant import Participant
-from Experiment.Experiment import Experiment
 from Parsers.ParserExperiment import ParserExperiment
 import pickle
 

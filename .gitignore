@@ -81,3 +81,5 @@ Parsers/__pycache__/
 Segments/
 
 Experiment/__pycache__/
+
+.idea/

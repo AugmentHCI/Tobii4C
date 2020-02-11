@@ -1,6 +1,6 @@
 from Parsers.ParserRawET import ParserRawET
-from AnalyserSaccades import AnalyserSaccades
-from AnalyserFixations import AnalyserFixations
+from Analyser.AnalyserSaccades import AnalyserSaccades
+from Analyser.AnalyserFixations import AnalyserFixations
 import pandas as pd
 import pickle
 

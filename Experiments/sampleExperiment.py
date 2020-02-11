@@ -1,8 +1,8 @@
 from Parsers.ParserAOI import ParserAOI
 from Parsers.ParserSegment import ParserSegment
 from Parsers.ParserRawET import ParserRawET
-from AnalyserFixations import AnalyserFixations
-from AnalyserSaccades import AnalyserSaccades
+from Analyser.AnalyserFixations import AnalyserFixations
+from Analyser.AnalyserSaccades import AnalyserSaccades
 from Experiment.Participant import Participant
 
 if __name__ == '__main__':
