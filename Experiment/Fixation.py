@@ -2,10 +2,9 @@ from Experiment.EyeMovement import EyeMovement as parent
 
 
 class Fixation(parent):
-    def __init__(self, FixPoint, startTime, endTime, durationThreshold, angleThreshold):
+    def __init__(self, FixPoint, startTime, endTime, durationThreshold, angleThreshold, pupilSize):
+        parent.__init__(self, startTime, endTime, pupilSize)
         self.fixpoint = FixPoint
-        self.start = startTime
-        self.end = endTime
         self.durationThreshold = durationThreshold
         self.angleThreshold = angleThreshold
         self.fixAOI = None

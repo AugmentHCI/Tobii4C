@@ -83,3 +83,5 @@ Segments/
 Experiment/__pycache__/
 
 .idea/
+
+Analyser/__pycache__/

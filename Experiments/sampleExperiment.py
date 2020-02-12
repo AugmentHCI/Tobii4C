@@ -21,7 +21,7 @@ if __name__ == '__main__':
 
 
     parserRawET = ParserRawET(all, segments)
-    parserRawET.createFixations()
+    parserRawET.createEyeMovements()
 
 
     for segment in segments:

@@ -28,6 +28,8 @@ class ParserEyeMovement:
         return eyemovements
 
 
+
+
 def calculateVectors(df):
     df['vector'] = df.apply(lambda row: getVector(row), axis=1)
     df['vectorNext'] = df['vector'].shift(periods=-1)
@@ -81,11 +83,11 @@ def angle_between(v1, v2):
     return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
 
-def findDispersion(df, index):
+def findDispersionDistance(df, index):
     """
     Find the dispersion in the df
     :param df:
-    :param index:
+    :param index: to return deltaX or deltaY
     :return:
     """
     minX = df['x'].idxmin()
@@ -111,6 +113,30 @@ def findAverage(df):
     z = df['z3'].mean()
     return [x, y, z]
 
+def findDispersion(df, x, y, z):
+    """
+    Calculate Dispersion
+    :param df:
+    :param x:
+    :param y:
+    :param z:
+    :param threshold:
+    :return: dispersion in degrees
+    """
+    [x1, y1, z1] = findAverage(df)
+    vectorAverage = [x - x1, y - y1, z - z1]
+    angle = 0
+    length = len(df.index)
+    for i in range(0, length):
+        x3 = df['x3'].iloc[i]
+        y3 = df['y3'].iloc[i]
+        z3 = df['z3'].iloc[i]
+        vector = [x - x3, y - y3, z - z3]
+        angleI = math.degrees(angle_between(vectorAverage, vector))
+        if angleI > angle:
+            angle = angleI
+    return angle
+
 
 def checkDispersion(df, x, y, z, threshold):
     """
@@ -125,23 +151,93 @@ def checkDispersion(df, x, y, z, threshold):
     :param threshold:
     :return:
     """
-    [ x1, y1, z1] = findAverage(df)
-    vectorAverage = [x - x1, y- y1, z - z1]
-    angle = 0
-    length = len(df.index)
-    for i in range(0, length):
-        x3 = df['x3'].iloc[i]
-        y3 = df['y3'].iloc[i]
-        z3 = df['z3'].iloc[i]
-        vector = [x - x3, y - y3, z - z3]
-        angleI = math.degrees(angle_between(vectorAverage, vector))
-        if angleI > angle:
-            angle = angleI
-    # as we take the angle to the middle, use the helft of threshold
+    angle = findDispersion(df, x, y, z)
+    # as we take the angle to the middle, use half of threshold
     if angle > (threshold/2):
         return False
     else:
         return True
+
+def createSaccade(df):
+
+    # append saccade
+    startTimeSac = df['system_time_stamp'].iloc[0]
+    endTimeSac = df['system_time_stamp'].iloc[-1]
+
+    startLocationXSac = df['x'].iloc[0]
+    startLocationYSac = df['y'].iloc[0]
+    endLocationXSac = df['x'].iloc[-1]
+    endLocationYSac = df['y'].iloc[-1]
+
+    oX = df.iloc[0]['xO']
+    oY = df.iloc[0]['yO']
+    oZ = df.iloc[0]['zO']
+
+    amplitude = findDispersion(df, oX, oY, oZ)
+    peakVelocity = findPeakVelocity(df)
+    pupilSize = findPupilSize(df)
+
+    startLocationSac = Coordinate(startLocationXSac, startLocationYSac)
+    endLocationSac = Coordinate(endLocationXSac, endLocationYSac)
+
+    saccade = Saccade(startLocationSac, endLocationSac, startTimeSac, endTimeSac, amplitude, peakVelocity, pupilSize)
+    return saccade
+
+
+def findPeakVelocity(df):
+    '''
+    Find the Peak in velocity
+    :param df:
+    :return:
+    1) check distance/time between points = velocity
+    2) find biggest velocity
+    3) Calculate the angle between these points
+    4) angle / time = biggest angular velocity
+    '''
+    peakVelocity = -1
+    for x in range(0, len(df.index) -1):
+        row1 = df.iloc[[x]]
+        row2 = df.iloc[[x+1]]
+        currentVelocity = findVelocity(row1, row2)
+        if currentVelocity > peakVelocity:
+            peakVelocity = currentVelocity
+    return peakVelocity
+
+
+
+
+def findVelocity(row1, row2):
+    dTime = float(row2['system_time_stamp']) - float(row1['system_time_stamp'])
+    distance = findDistance(row1, row2)
+    velocity = distance / dTime
+    return velocity
+
+def findDistance(row1, row2):
+    x1 = row1['x'].values[0]
+    x2 = row2['x'].values[0]
+    y1 = row1['y'].values[0]
+    y2 = row2['y'].values[0]
+    dX = abs(x2 - x1)
+    dY = abs(y2 - y1)
+    distance = math.sqrt(math.pow(dX, 2) + math.pow(dY, 2))
+    return distance
+
+
+def findPupilSize(df):
+    mRight = df['right_pupil_diameter'].mean()
+    mLeft = df['left_pupil_diameter'].mean()
+    avg = mLeft + mRight / 2
+    return avg
+
+def createFixation(window, durationThreshold, angleThreshold):
+    startTimeFix = window['system_time_stamp'].iloc[0]
+    endTimeFix = window['system_time_stamp'].iloc[-1]
+    fixX = window['x'].mean()
+    fixY = window['y'].mean()
+    fix = Coordinate(fixX, fixY)
+    pupilSize = findPupilSize(window)
+    fixation = Fixation(fix, startTimeFix, endTimeFix, durationThreshold, angleThreshold, pupilSize)
+    return fixation
 
 
 
@@ -158,7 +254,7 @@ def findFixations(df, durationThreshold, angleThreshold):
             oY = df.iloc[start]['yO']
             oZ = df.iloc[start]['zO']
 
-            # Check if all points in window are within limits
+            # Check if all points in window are within limits of a fixation
             dispersion = checkDispersion(window, oX, oY, oZ, angleThreshold)
             if dispersion:
                 durationFix += 1
@@ -167,30 +263,13 @@ def findFixations(df, durationThreshold, angleThreshold):
                 endTimeFix = df['system_time_stamp'].iloc[start + durationFix - 1]
                 durationFixation = endTimeFix - startTimeFix
                 if durationFixation > durationThreshold:
-
                     # append saccade
-                    startTimeSac = df['system_time_stamp'].iloc[start-durationSac]
-                    endTimeSac = df['system_time_stamp'].iloc[start-1]
-
-                    startLocationXSac = df['x'].iloc[start-durationSac]
-                    startLocationYSac = df['y'].iloc[start-durationSac]
-                    endLocationXSac = df['x'].iloc[start-1]
-                    endLocationYSac = df['y'].iloc[start-1]
-
-                    startLocationSac = Coordinate(startLocationXSac, startLocationYSac)
-                    endLocationSac = Coordinate(endLocationXSac, endLocationYSac)
-
-                    saccade = Saccade(startLocationSac, endLocationSac, startTimeSac, endTimeSac)
+                    saccadeData = df.iloc[start - durationSac:start]
+                    saccade = createSaccade(saccadeData)
                     eyeMovements.append(saccade)
 
                     # append fixation
-                    startTimeFix = df['system_time_stamp'].iloc[start]
-                    endTimeFix = df['system_time_stamp'].iloc[start + durationFix - 1]
-                    fixX = window['x'].mean()
-                    fixY = window['y'].mean()
-                    fix = Coordinate(fixX, fixY)
-
-                    fixation = Fixation(fix, startTimeFix, endTimeFix, durationThreshold, angleThreshold )
+                    fixation = createFixation(window, durationThreshold, angleThreshold)
                     eyeMovements.append(fixation)
 
                     # reset window and durations

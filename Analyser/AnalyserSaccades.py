@@ -26,7 +26,7 @@ class AnalyserSaccades:
         saccades = segment.getSaccades()
         cumulativeLength = 0
         for saccade in saccades:
-            cumulativeLength += saccade.getLenght()
+            cumulativeLength += saccade.getLength()
         segment.appendFeatures(cumulativeLength)
 
     def parseAOISaccades(self):

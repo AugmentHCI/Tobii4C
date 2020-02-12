@@ -21,7 +21,7 @@ Scripts to analyse data and to write it to a csv file
 Folder to store objects
 
 ##Parsers
-Classes to parse the data 
+Classes to parse the data and create objects
 
 ##Rawdata
 Folder with raw data
@@ -29,5 +29,6 @@ Folder with raw data
 ##SampleData
 Folder with sample data for a fictive experiment
 
-
+##Segments
+Data about segments of participants
 

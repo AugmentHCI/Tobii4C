@@ -15,7 +15,11 @@ class ParserRawET:
         self.durationThreshold = durationThreshold
         self.angleThreshold = angleThreshold
 
-    def createFixations(self):
+    def createEyeMovements(self):
+        '''
+        Create fixations and saccades
+        :return:
+        '''
         df = pd.read_csv(self.pathData, sep=';')
         for segment in self.segments:
             start = segment.getStart()
@@ -29,6 +33,8 @@ class ParserRawET:
 
 
 
+
+
 def selectSegmentData(df, start, end):
     """
         Select all the data between start and end
@@ -39,7 +45,8 @@ def selectSegmentData(df, start, end):
     """
     df1 = df.loc[:, ['right_gaze_point_on_display_area', 'left_gaze_point_on_display_area', 'system_time_stamp',
                     'right_gaze_origin_in_user_coordinate_system', 'right_gaze_point_in_user_coordinate_system',
-                    'left_gaze_origin_in_user_coordinate_system', 'left_gaze_point_in_user_coordinate_system'
+                    'left_gaze_origin_in_user_coordinate_system', 'left_gaze_point_in_user_coordinate_system',
+                     'right_pupil_diameter', 'left_pupil_diameter'
                     ]]
     # drop last lines as they can be invalid
     df1.drop(df1.tail(2).index, inplace=True)

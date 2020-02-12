@@ -13,7 +13,7 @@ def analyseSaccades(experiment):
     segments = participant.getSegments()
 
     parserRawET = ParserRawET(rawPath, segments, self.durationThreshold, self.angleThreshold)
-    parserRawET.createFixations()
+    parserRawET.createEyeMovements()
     for segment in segments:
         print(segment.getScene().getName())
         analyserFix = AnalyserFixations(segment, aois, participant)

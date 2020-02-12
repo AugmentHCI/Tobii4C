@@ -52,7 +52,7 @@ class Experiment:
         segments = participant.getSegments()
 
         parserRawET = ParserRawET(rawPath, segments, self.durationThreshold, self.angleThreshold)
-        parserRawET.createFixations()
+        parserRawET.createEyeMovements()
         for segment in segments:
             print(segment.getScene().getName())
             analyserFix = AnalyserFixations(segment, aois, participant)
@@ -60,6 +60,30 @@ class Experiment:
             fixationList = analyserFix.getFixationList()
             analyserSac = AnalyserSaccades(segment, aois, participant)
             analyserSac.parseSaccades()
+
+    def analyseAllParticipantsClassifier(self):
+        participants = self.getParticipants()
+        for participant in participants:
+            id = participant.getId()
+            print(id)
+            self.analyseParticipantClassifier(participant)
+
+    def analyseParticipantClassifier(self, participant):
+        aois = self.getAOIs()
+        id = participant.getId()
+        rawPath = self.rawPath + str(id) + '.csv'
+        segments = participant.getSegments()
+        parserRawET = ParserRawET(rawPath, segments, self.durationThreshold, self.angleThreshold)
+        # create fixations
+        parserRawET.createEyeMovements()
+        for segment in segments:
+            analyserSac = AnalyserSaccades(segment, aois, participant)
+
+
+
+
+
+
 
     def saveExperimentToFile(self, filename):
         fileHandler = open(filename, 'wb+')
