@@ -85,3 +85,5 @@ Experiment/__pycache__/
 .idea/
 
 Analyser/__pycache__/
+
+.DS_Store
