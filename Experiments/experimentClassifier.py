@@ -9,7 +9,7 @@ userList = [100805001, 101057002, 101553005, 101714006, 120904002,
 
 
 
-userList = [201238019]
+# userList = [90748011, 91316012, 121255014]
 offset = 15000
 # path to all data and to segments
 aoiPath = 'Experiment2019.aoi'
@@ -25,5 +25,5 @@ if __name__ == '__main__':
     experiment = experimentParser.parseExperiment()
     experiment.analyseAllParticipantsClassifier()
 
-    # experimentPath = outputPath + 'experimentClassifier_' +str(offset) + str(durationThreshold) + '.obj'
-    # experiment.saveExperimentToFile(experimentPath)
+    experimentPath = outputPath + 'experimentClassifier_' +str(offset) + str(durationThreshold) + '.obj'
+    experiment.saveExperimentToFile(experimentPath)

@@ -17,14 +17,14 @@ class ParserEyeMovement:
         """
         self.data = data
         self.durationThreshold = durationThreshold
-        self.angleTrheshold = angleThreshold
+        self.angleThreshold = angleThreshold
 
     def createEyeMovements(self):
         df = self.data
         vectors = calculateVectors(df)
         distance = calculateDistance(vectors)
         valid = selectValidPoints(distance)
-        eyemovements = findFixations(valid, self.durationThreshold, self.angleTrheshold)
+        eyemovements = findFixations(valid, self.durationThreshold, self.angleThreshold)
         return eyemovements
 
 
@@ -159,7 +159,6 @@ def checkDispersion(df, x, y, z, threshold):
         return True
 
 def createSaccade(df):
-
     # append saccade
     startTimeSac = df['system_time_stamp'].iloc[0]
     endTimeSac = df['system_time_stamp'].iloc[-1]
@@ -242,12 +241,13 @@ def createFixation(window, durationThreshold, angleThreshold):
 
 
 def findFixations(df, durationThreshold, angleThreshold):
+    eyeMovements = []
+    if not df.empty:
         # Loop over file
         durationFix = 2
         durationSac = 2
         start = 0
         length = len(df.index)
-        eyeMovements = []
         for i in range(0, length):
             window = df.iloc[start:start + durationFix]
             oX = df.iloc[start]['xO']
@@ -264,9 +264,12 @@ def findFixations(df, durationThreshold, angleThreshold):
                 durationFixation = endTimeFix - startTimeFix
                 if durationFixation > durationThreshold:
                     # append saccade
-                    saccadeData = df.iloc[start - durationSac:start]
-                    saccade = createSaccade(saccadeData)
-                    eyeMovements.append(saccade)
+                    # if the segment started with a fixation
+                    # do not add saccade
+                    if start - durationSac > 0:
+                        saccadeData = df.iloc[start - durationSac:start]
+                        saccade = createSaccade(saccadeData)
+                        eyeMovements.append(saccade)
 
                     # append fixation
                     fixation = createFixation(window, durationThreshold, angleThreshold)
@@ -281,4 +284,7 @@ def findFixations(df, durationThreshold, angleThreshold):
                     durationFix = 2
                     durationSac += 1
                     start = i
+        return eyeMovements
+    else:
+        print('empty dataframe')
         return eyeMovements

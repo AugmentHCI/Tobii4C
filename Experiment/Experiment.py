@@ -1,6 +1,8 @@
 from Parsers.ParserRawET import ParserRawET
 from Analyser.AnalyserSaccades import AnalyserSaccades
 from Analyser.AnalyserFixations import AnalyserFixations
+from Analyser.AnalyserClassifier import AnalyserSegmentClassifier
+
 import pandas as pd
 import pickle
 
@@ -77,7 +79,8 @@ class Experiment:
         # create fixations
         parserRawET.createEyeMovements()
         for segment in segments:
-            analyserSac = AnalyserSaccades(segment, aois, participant)
+            analyser = AnalyserSegmentClassifier(segment, participant)
+            segment.setAnalyser(analyser)
 
 
 

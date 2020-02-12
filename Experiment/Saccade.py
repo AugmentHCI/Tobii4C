@@ -22,6 +22,7 @@ class Saccade(parent):
         self.absAngle = None
         self.relAngle = None
         self.vector = None
+        self.velocity = None
         self.setDistance()
         self.setVelocity()
 
@@ -43,6 +44,9 @@ class Saccade(parent):
 
     def getPeakVelocity(self):
         return self.peakVelocity
+
+    def getVelocity(self):
+        return self.velocity
 
 
 

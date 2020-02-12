@@ -14,6 +14,7 @@ class Segment:
         self.aoilist = []
         self.aoidurationlist = []
         self.features = []
+        self.analyser = None
 
     def getScene(self):
         return self.scene
@@ -29,6 +30,9 @@ class Segment:
 
     def getEyeMovements(self):
         return self.eyemovements
+
+    def getAnalyser(self):
+        return self.analyser
 
     def setEyemovements(self, eyemovements):
         self.eyemovements = eyemovements
@@ -67,5 +71,8 @@ class Segment:
 
     def appendFeatures(self, feature):
         self.features.append(feature)
+
+    def setAnalyser(self, analyser):
+        self.analyser = analyser
 
 
