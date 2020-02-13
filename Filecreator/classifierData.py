@@ -50,7 +50,6 @@ def getClassifierDataParticipant(participant, rowPC):
             'Neuroticism': rowPC['Neuroticism'].values[0],
             'Openess': rowPC['Openess'].values[0]
         }
-
         dataParticipant.append(row)
     return dataParticipant
 
@@ -58,11 +57,11 @@ def getClassifierDataParticipant(participant, rowPC):
 
 
 if __name__ == '__main__':
-    experimentPath = '../Objects/ClassifierexperimentClassifier_15000100.obj'
+    experimentPath = '../Objects/ClassifierexperimentClassifier_5000100.obj'
     experiment = readExperimentFromFile(experimentPath)
     data = getClassifierData(experiment)
     dfParsed = pd.DataFrame(data)
-    dfParsed.to_csv('../data/classifier.csv')
+    dfParsed.to_csv('../data/classifier5000.csv')
 
 
 

@@ -1,4 +1,4 @@
-
+import math
 
 
 class AnalyserSegmentClassifier:
@@ -62,10 +62,14 @@ class AnalyserSegmentClassifier:
         saccades = segment.getSaccades()
         sum = 0
         for saccade in saccades:
-            sum += saccade.getAmplitude()
+            sum = safeAdd(sum, saccade.getAmplitude())
         if len(saccades) > 0:
             avg = sum / len(saccades)
             self.avgSaccadeAmplitude = avg
+        else:
+            print("No Saccades")
+            self.avgSaccadeAmplitude = -1
+
 
 
 
@@ -74,10 +78,13 @@ class AnalyserSegmentClassifier:
         saccades = segment.getSaccades()
         sum = 0
         for saccade in saccades:
-            sum += saccade.getVelocity()
+            sum = safeAdd(sum, saccade.getVelocity())
         if len(saccades) > 0:
             avg = sum / len(saccades)
             self.avgSaccadeVelocity = avg
+        else:
+            print("No Saccades")
+            self.avgSaccadeVelocity = -1
 
     def setPeakSaccadeVelocity(self):
         segment = self.getSegment()
@@ -94,18 +101,22 @@ class AnalyserSegmentClassifier:
         fixations = segment.getFixations()
         nbFixations = len(fixations)
         duration = segment.getDuration()
-        return nbFixations / duration
+        rate = nbFixations / duration
+        self.fixationRate = rate
 
     def setAvgFixationDuration(self):
         segment = self.getSegment()
         fixations = segment.getFixations()
         sum = 0
         for fixation in fixations:
-            sum += fixation.getDuration()
+            sum = safeAdd(sum,fixation.getDuration())
 
         if len(fixations) > 0:
             avg = sum / len(fixations)
             self.avgFixationDuration = avg
+        else:
+            print("No Fixations")
+            self.avgFixationDuration = -1
 
 
 
@@ -113,9 +124,20 @@ class AnalyserSegmentClassifier:
         segment = self.getSegment()
         fixations = segment.getFixations()
         saccades = segment.getSaccades()
-        if len(fixations) > 0:
-            ratio = len(saccades) / len(fixations)
+        durationSaccades = 0
+        for saccade in saccades:
+            durationSaccades = safeAdd(durationSaccades, saccade.getDuration())
+
+        durationFixations = 0
+        for fix in fixations:
+            durationFixations = safeAdd(durationFixations, fix.getDuration())
+
+        if durationFixations > 0:
+            ratio = durationSaccades / durationFixations
             self.ratioSaccadeFixation = ratio
+        else:
+            print("No Fixations")
+            self.ratioSaccadeFixation = -1
 
 
     def setAvgPupilSize(self):
@@ -123,11 +145,17 @@ class AnalyserSegmentClassifier:
         eyeMovements = segment.getEyeMovements()
         sum = 0
         for eyeMove in eyeMovements:
-            sum += eyeMove.getPupilSize()
+            sum = safeAdd(sum, eyeMove.getPupilSize())
         if len(eyeMovements) > 0:
             avg = sum / len(eyeMovements)
             self.avgPupilSize = avg
+        else:
+            print("No eye movements")
+            self.avgPupilSize = -1
 
 
-
+def safeAdd(a, b):
+    if not math.isnan(b):
+        a = a+b
+    return a
 

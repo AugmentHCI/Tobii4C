@@ -9,8 +9,8 @@ userList = [100805001, 101057002, 101553005, 101714006, 120904002,
 
 
 
-# userList = [90748011, 91316012, 121255014]
-offset = 15000
+# userList = [91316012]
+offset = 5000
 # path to all data and to segments
 aoiPath = 'Experiment2019.aoi'
 rawPath = './Rawdata/'
