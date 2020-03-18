@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 
 class AnalyserSegmentClassifier:
@@ -14,6 +15,9 @@ class AnalyserSegmentClassifier:
         self.avgFixationDuration = None
         self.ratioSaccadeFixation = None
         self.avgPupilSize = None
+        self.avgSaccadeLength = None
+        self.mostFrequentDirection = None
+        self.heatMap = None
         self.setSaccadeRate()
         self.setAvgSaccadeAmplitude()
         self.setAvgSaccadeVelocity()
@@ -22,6 +26,9 @@ class AnalyserSegmentClassifier:
         self.setAvgFixationDuration()
         self.setRatioSaccadeFixation()
         self.setAvgPupilSize()
+        self.setAvgSaccadeLength()
+        self.setMostFrequentDirection()
+        self.setHeatmap()
 
     def getSegment(self):
         return self.segment
@@ -50,6 +57,15 @@ class AnalyserSegmentClassifier:
     def getAvgPupilSize(self):
         return self.avgPupilSize
 
+    def getAvgSaccadeLength(self):
+        return self.avgSaccadeLength
+
+    def getMostFrequentDirection(self):
+        return self.mostFrequentDirection
+
+    def getHeatMap(self):
+        return self.heatMap
+
     def setSaccadeRate(self):
         segment = self.getSegment()
         saccades = segment.getSaccades()
@@ -69,9 +85,6 @@ class AnalyserSegmentClassifier:
         else:
             print("No Saccades")
             self.avgSaccadeAmplitude = -1
-
-
-
 
     def setAvgSaccadeVelocity(self):
         segment = self.getSegment()
@@ -152,6 +165,58 @@ class AnalyserSegmentClassifier:
         else:
             print("No eye movements")
             self.avgPupilSize = -1
+
+    def setAvgSaccadeLength(self):
+        segment = self.getSegment()
+        saccades = segment.getSaccades()
+        nbSaccades = len(saccades)
+        sum = 0
+        for saccade in saccades:
+            sum += saccade.getLength()
+        if nbSaccades != 0:
+            avg = sum / nbSaccades
+            self.avgSaccadeLength = avg
+        else:
+            self.avgSaccadeLength = 0
+
+    def setMostFrequentDirection(self):
+        segment = self.getSegment()
+        saccades = segment.getSaccades()
+        directions = [0, 0, 0, 0, 0, 0, 0, 0]
+        for saccade in saccades:
+            direction = saccade.getDirection()
+            curr = directions[direction]
+            directions[direction] = curr + 1
+        maxIndex = directions.index(max(directions))
+        self.mostFrequentDirection = maxIndex
+
+    def setHeatmap(self):
+        gridSize = 4
+        matrix = [[0 for x in range(gridSize + 1)] for y in range(gridSize + 1)]
+        segment = self.getSegment()
+        fixations = segment.getFixations()
+        xValues = []
+        yValues = []
+        for fix in fixations:
+            fixPoint = fix.getFixPoint()
+            x = fixPoint.getX()
+            y = fixPoint.getY()
+            xValues.append(x)
+            yValues.append(y)
+        binnedX = getBins(gridSize, xValues)
+        binnedY = getBins(gridSize, yValues)
+        for x in range(0, len(binnedX)):
+            for y in range(0, len(binnedY)):
+                row = binnedX[x]
+                column = binnedY[y]
+                curr = matrix[row][column]
+                matrix[row][column] = curr + 1
+        self.heatMap = matrix
+
+def getBins(nbBins, data):
+    bins = np.linspace(0, 100, nbBins)
+    binned = np.digitize(data, bins)
+    return binned
 
 
 def safeAdd(a, b):

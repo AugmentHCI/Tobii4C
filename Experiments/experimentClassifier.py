@@ -9,21 +9,25 @@ userList = [100805001, 101057002, 101553005, 101714006, 120904002,
 
 
 
-# userList = [91316012]
+
 offset = 5000
 # path to all data and to segments
 aoiPath = 'Experiment2019.aoi'
 rawPath = './Rawdata/'
-segmentPath = './Segments/' + str(offset) + '/'
-outputPath = './Objects/Classifier'
+segmentPathBase = './Segments/Percentages/'
+outputPath = './Objects/Classifier/'
 durationThreshold = 100
 angleThreshold = 0.5
 
 
 if __name__ == '__main__':
-    experimentParser = ParserExperiment(aoiPath, segmentPath, rawPath, outputPath, userList, durationThreshold, angleThreshold)
-    experiment = experimentParser.parseExperiment()
-    experiment.analyseAllParticipantsClassifier()
+    for x in range(60, 110, 10):
+        print(x)
+        segmentPath = segmentPathBase + str(x) + '/'
+        experimentParser = ParserExperiment(aoiPath, segmentPath, rawPath, outputPath, userList, durationThreshold, angleThreshold)
+        experiment = experimentParser.parseExperiment()
+        experiment.analyseAllParticipantsClassifier()
 
-    experimentPath = outputPath + 'experimentClassifier_' +str(offset) + str(durationThreshold) + '.obj'
-    experiment.saveExperimentToFile(experimentPath)
+        experimentPath = outputPath + 'experimentClassifierPercentace_' + str(x) + '.obj'
+        experiment.saveExperimentToFile(experimentPath)
+

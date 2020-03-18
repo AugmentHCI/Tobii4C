@@ -45,7 +45,6 @@ class AnalyserSaccades:
             vector = Vector(startPoint, endPoint)
             angle = vector.getAbsAngle()
             saccade.setAbsAngle(angle)
-            saccade.setVector(vector)
 
     def calculateRelAngles(self):
         segment = self.getSegment()

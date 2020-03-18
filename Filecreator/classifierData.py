@@ -17,6 +17,16 @@ def getClassifierData(experiment):
         dataExperiment.extend(dataParticipant)
     return dataExperiment
 
+def appendHeatMap(analyser, row):
+    matrix = analyser.getHeatMap()
+    rows = len(matrix)
+    columns = len(matrix[0])
+    for x in range(0,rows):
+        for y in range(0, columns):
+            key = 'heatmap_' + str(x) + str(y)
+            row[key] = matrix[x][y]
+    return row
+
 def getClassifierDataParticipant(participant, rowPC):
     pid = participant.getId()
     segments = participant.getSegments()
@@ -24,7 +34,6 @@ def getClassifierDataParticipant(participant, rowPC):
     for segment in segments:
         analyser = segment.getAnalyser()
         scene = segment.getScene().getName()
-
         row = {
             'Person': pid,
             'Scene': scene,
@@ -36,6 +45,8 @@ def getClassifierDataParticipant(participant, rowPC):
             'avgFixationDuration': analyser.getAvgFixationDuration(),
             'ratioSaccadeFixation': analyser.getRatioSaccadeFixation(),
             'avgPupilSize': analyser.getAvgPupilSize(),
+            'avgSaccadeLength': analyser.getAvgSaccadeLength(),
+            'mostFrequentDirection': analyser.getMostFrequentDirection(),
             'VWM': rowPC['VWM'].values[0],
             'MS': rowPC['MS'].values[0],
             'LOC': rowPC['LOC'].values[0],
@@ -50,6 +61,7 @@ def getClassifierDataParticipant(participant, rowPC):
             'Neuroticism': rowPC['Neuroticism'].values[0],
             'Openess': rowPC['Openess'].values[0]
         }
+        row = appendHeatMap(analyser, row)
         dataParticipant.append(row)
     return dataParticipant
 
@@ -57,11 +69,12 @@ def getClassifierDataParticipant(participant, rowPC):
 
 
 if __name__ == '__main__':
-    experimentPath = '../Objects/ClassifierexperimentClassifier_5000100.obj'
-    experiment = readExperimentFromFile(experimentPath)
-    data = getClassifierData(experiment)
-    dfParsed = pd.DataFrame(data)
-    dfParsed.to_csv('../data/classifier5000.csv')
+    for x in range(10, 100, 10):
+        experimentPath = '../Objects/Classifier/experimentClassifierPercentace_' + str(x) + '.obj'
+        experiment = readExperimentFromFile(experimentPath)
+        data = getClassifierData(experiment)
+        dfParsed = pd.DataFrame(data)
+        dfParsed.to_csv('../data/classifier/' + str(x) + '.csv', index=False)
 
 
 

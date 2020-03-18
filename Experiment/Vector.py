@@ -7,11 +7,13 @@ class Vector:
         """
 
         :param p1: Coordinate
-        :param p2:
+        :param p2: Coordinate
         """
         self.startPoint = p1
         self.endPoint = p2
         self.vector = self.calculateVector()
+        self.direction = None
+        self.setDirection()
 
     def calculateVector(self):
         x1 = self.startPoint.getX()
@@ -34,6 +36,10 @@ class Vector:
         return self.vector[1]
 
     def getAbsAngle(self):
+        '''
+        Angle in degrees
+        :return:
+        '''
         dx = self.getDeltaX()
         dy = self.getDeltaY()
         if dx != 0:
@@ -47,6 +53,33 @@ class Vector:
         radAngle = angle_between(self.getVector(), v1.getVector())
         degAngle = math.degrees(radAngle)
         return degAngle
+
+    def getDirection(self):
+        return self.direction
+
+    def setDirection(self):
+        angle = self.getAbsAngle()
+        direction = 0
+        if angle < 45:
+            direction = 0
+        elif angle < 90:
+            direction = 1
+        elif angle < 135:
+            direction = 2
+        elif angle < 180:
+            direction = 3
+        elif angle < 225:
+            direction = 4
+        elif angle < 270:
+            direction = 5
+        elif angle < 315:
+            direction = 6
+        elif angle < 360:
+            direction = 7
+        else:
+            direction = 8
+
+        self.direction = direction
 
 
 
@@ -64,5 +97,6 @@ def angle_between(v1, v2):
     v2_u = unit_vector(v2)
     angle =  np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
     return angle
+
 
 

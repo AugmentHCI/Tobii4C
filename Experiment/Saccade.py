@@ -1,4 +1,5 @@
 from Experiment.EyeMovement import EyeMovement as parent
+from Experiment.Vector import Vector
 import math
 
 
@@ -16,14 +17,18 @@ class Saccade(parent):
         self.endLocation = endLocation
         self.amplitude = amplitude
         self.peakVelocity = peakVelocity
-        self.distance = None
+
         self.startAOI = None
         self.endAOI = None
+        self.vector = None
         self.absAngle = None
         self.relAngle = None
-        self.vector = None
         self.velocity = None
-        self.setDistance()
+        self.direction = None
+        self.setVelocity()
+        self.setVector()
+        self.setDirection()
+        self.setAbsAngle()
         self.setVelocity()
 
 
@@ -48,17 +53,14 @@ class Saccade(parent):
     def getVelocity(self):
         return self.velocity
 
+    def getVector(self):
+        return self.vector
 
+    def getLength(self):
+        return self.getVector().getMagnitude()
 
-    def setDistance(self):
-        x1 = self.startLocation.getX()
-        x2 = self.endLocation.getX()
-        y1 = self.startLocation.getY()
-        y2 = self.endLocation.getY()
-        dX = abs(x2 - x1)
-        dY = abs(y2 - y1)
-        distance = math.sqrt(math.pow(dX, 2) + math.pow(dY, 2))
-        self.distance = distance
+    def getDirection(self):
+        return self.direction
 
 
     def setStartAOI(self, aoi):
@@ -68,24 +70,32 @@ class Saccade(parent):
         self.endAOI = aoi
 
 
-    def setAbsAngle(self, angle):
+    def setAbsAngle(self):
         """
         :param angle: in degrees
         :return:
         """
+        angle = self.getVector().getAbsAngle()
         self.absAngle = angle
 
     def setRelAngleWithNext(self, angle):
         self.relAngle = angle
 
-    def setVector(self, vector):
+    def setVector(self):
+        '''
+        Vector between start and end point
+        :param vector:
+        :return:
+        '''
+        start = self.getStartLocation()
+        end = self.getEndLocation()
+        vector = Vector(start, end)
         self.vector = vector
 
-    def getVector(self):
-        return self.vector
-
-    def getLength(self):
-        return self.getVector().getMagnitude()
 
     def setVelocity(self):
         self.velocity = self.getAmplitude() / self.getDuration()
+
+
+    def setDirection(self):
+        self.direction = self.getVector().getDirection()
